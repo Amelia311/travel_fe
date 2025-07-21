@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../services/trip_service.dart'; // panggil API ke backend Laravel
+import '../services/trip_service.dart'; 
 
 class AddTripScreen extends StatefulWidget {
   const AddTripScreen({super.key});
@@ -20,10 +20,7 @@ class _AddTripScreenState extends State<AddTripScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Trip berhasil ditambahkan!'))
         );
-        setState(() {
-          title = '';
-          selectedDate = null;
-        });
+        Navigator.pop(context, true); // <- kembali ke halaman sebelumnya dengan result true
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Gagal menambahkan trip!'))
