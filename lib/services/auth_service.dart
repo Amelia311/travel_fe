@@ -25,7 +25,7 @@ class AuthService {
   }
 
   static Future<Map<String, dynamic>> login(String email, String password) async {
-    print("Mulai login...");
+    // print("Mulai login...");
     final response = await http.post(
       Uri.parse("$baseUrl/login"),
       body: {
@@ -38,9 +38,8 @@ class AuthService {
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      print("Data response: $data");
+      // print("Data response: $data");
 
-      // ✅ Ubah dari access_token ke token
       final token = data['token'];
 
       if (token == null) {
@@ -50,7 +49,7 @@ class AuthService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('auth_token', token);
 
-      print('Token disimpan: $token');
+      // print('Token disimpan: $token');
 
       return {'success': true, 'data': data};
     } else {
@@ -61,4 +60,10 @@ class AuthService {
       };
     }
   }
+
+  static Future<String?> getToken() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString('auth_token');
+}
+
 }

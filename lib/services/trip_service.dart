@@ -60,4 +60,22 @@ class TripService {
       throw Exception('Failed to load trips');
     }
   }
+
+  static Future<List<dynamic>> fetchItineraries(int tripId) async {
+  final token = await getToken();
+  final response = await http.get(
+    Uri.parse('$baseUrl/trips/$tripId/itineraries'),
+    headers: {
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token', 
+    },
+  );
+
+  if (response.statusCode == 200) {
+    return json.decode(response.body);
+  } else {
+    throw Exception('Failed to load itineraries');
+  }
+}
+
 }

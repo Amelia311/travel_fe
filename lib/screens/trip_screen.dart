@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/trip_service.dart';
-import 'add_trip_screen.dart'; // pastikan ini diimport
+import 'add_trip_screen.dart';
+import 'itinerary_screen.dart'; // ← ini ditambahkan
 
 class TripScreen extends StatefulWidget {
   @override
@@ -53,6 +54,17 @@ class _TripScreenState extends State<TripScreen> {
                   ],
                 ),
                 isThreeLine: true,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ItineraryScreen(
+                        tripId: trip['id'],
+                        tripName: trip['title'], // atau trip['name'] kalau beda
+                      ),
+                    ),
+                  );
+                },
               );
             },
           );
@@ -60,13 +72,12 @@ class _TripScreenState extends State<TripScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          // Pindah ke halaman tambah trip
           final result = await Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => AddTripScreen()),
           );
           if (result == true) {
-            _refreshTrips(); // kalau berhasil nambah, refresh
+            _refreshTrips();
           }
         },
         child: const Icon(Icons.add),
