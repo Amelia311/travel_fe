@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/itinerary_service.dart';
 import 'add_activity_screen.dart';
+import '../models/itinerary_model.dart';
 
 class ItineraryScreen extends StatefulWidget {
   final int tripId;
@@ -13,7 +14,7 @@ class ItineraryScreen extends StatefulWidget {
 }
 
 class _ItineraryScreenState extends State<ItineraryScreen> {
-  late Future<List<Map<String, dynamic>>> _itineraryList;
+  late Future<List<Itinerary>> _itineraryList;
 
   @override
   void initState() {
@@ -29,7 +30,7 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("Itinerary: ${widget.tripName}")),
-      body: FutureBuilder<List<Map<String, dynamic>>>(
+      body: FutureBuilder<List<Itinerary>>(
         future: _itineraryList,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -44,32 +45,27 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
             return const Center(child: Text("Belum ada aktivitas"));
           }
 
-          // Kelompokkan berdasarkan hari
-          final grouped = <String, List<Map<String, dynamic>>>{};
+          // Kelompokkan berdasarkan tanggal
+          final grouped = <String, List<Itinerary>>{};
           for (var item in itinerary) {
-            final day = item['day'];
-            if (day == null) continue;
-
-            grouped.putIfAbsent(day.toString(), () => []).add(item);
+            grouped.putIfAbsent(item.date, () => []).add(item);
           }
 
           return ListView(
             children: grouped.entries.map((entry) {
-              final day = entry.key;
+              final date = entry.key;
               final items = entry.value;
 
               return ExpansionTile(
-                title: Text("Hari: $day"),
+                title: Text("Tanggal: $date"),
                 children: items.map((act) {
-                  final time = act['time'] ?? '-';
-                  final activity = act['activity'] ?? '(Tidak ada aktivitas)';
-
+                  final time = act.startTime ?? '-';
                   return ListTile(
-                    title: Text('$time - $activity'),
+                    title: Text('$time - ${act.activity}'),
                     trailing: IconButton(
                       icon: const Icon(Icons.delete),
                       onPressed: () async {
-                        await ItineraryService.deleteItinerary(act['id']);
+                        await ItineraryService.deleteItinerary(act.id);
                         setState(() => _fetchItineraries());
                       },
                     ),

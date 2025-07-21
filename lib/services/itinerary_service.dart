@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'auth_service.dart';
+import '../models/itinerary_model.dart';
+
 
 class ItineraryService {
   static const baseUrl = 'http://127.0.0.1:8000/api'; // sesuaikan ip kamu
@@ -13,24 +15,37 @@ class ItineraryService {
   }
 
 
-static Future<List<Map<String, dynamic>>> getItineraries(int tripId) async {
-  final token = await getToken();
+// static Future<List<Map<String, dynamic>>> getItineraries(int tripId) async {
+//   final token = await getToken();
 
-  if (token == null) {
-    throw Exception('Token tidak ditemukan!');
-  }
+//   if (token == null) {
+//     throw Exception('Token tidak ditemukan!');
+//   }
 
-  final response = await http.get(
-    Uri.parse('$baseUrl/trips/$tripId/itineraries'),
-    headers: {'Authorization': 'Bearer $token'}, // ← pakai token!
-  );
+//   final response = await http.get(
+//     Uri.parse('$baseUrl/trips/$tripId/itineraries'),
+//     headers: {'Authorization': 'Bearer $token'}, // ← pakai token!
+//   );
+
+//   if (response.statusCode == 200) {
+//     return List<Map<String, dynamic>>.from(json.decode(response.body));
+//   } else {
+//     throw Exception('Gagal mengambil data itinerary');
+//   }
+// }
+
+static Future<List<Itinerary>> getItineraries(int tripId) async {
+  final response = await http.get(Uri.parse('$baseUrl/api/trips/$tripId/itinerary'));
+print(jsonDecode(response.body));
 
   if (response.statusCode == 200) {
-    return List<Map<String, dynamic>>.from(json.decode(response.body));
+    final List<dynamic> data = jsonDecode(response.body);
+    return data.map((json) => Itinerary.fromJson(json)).toList();
   } else {
-    throw Exception('Gagal mengambil data itinerary');
+    throw Exception('Gagal memuat itinerary');
   }
 }
+
 
   static Future<bool> addItinerary(Map<String, dynamic> data) async {
     final token = await AuthService.getToken();
