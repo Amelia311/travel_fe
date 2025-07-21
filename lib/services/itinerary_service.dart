@@ -35,27 +35,44 @@ class ItineraryService {
 // }
 
 static Future<List<Itinerary>> getItineraries(int tripId) async {
-  final response = await http.get(Uri.parse('$baseUrl/api/trips/$tripId/itinerary'));
-print(jsonDecode(response.body));
+  final token = await getToken(); // ini optional kalau butuh token
+  final response = await http.get(
+    Uri.parse('$baseUrl/trips/$tripId/itineraries'),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token', // hapus jika backend tidak butuh
+    },
+  );
+
+  print('STATUS CODE: ${response.statusCode}');
+  print('BODY: ${response.body}');
 
   if (response.statusCode == 200) {
-    final List<dynamic> data = jsonDecode(response.body);
-    return data.map((json) => Itinerary.fromJson(json)).toList();
+  final List<dynamic> data = jsonDecode(response.body);
+  return data.map((json) => Itinerary.fromJson(json)).toList();
   } else {
     throw Exception('Gagal memuat itinerary');
   }
 }
 
 
-  static Future<bool> addItinerary(Map<String, dynamic> data) async {
-    final token = await AuthService.getToken();
-    final response = await http.post(
-      Uri.parse('$baseUrl/itineraries'),
-      headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $token',},
-      body: json.encode(data),
-    );
-    return response.statusCode == 201;
-  }
+static Future<bool> addItinerary(Map<String, dynamic> data) async {
+  final token = await AuthService.getToken();
+  final response = await http.post(
+    Uri.parse('$baseUrl/itineraries'),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    },
+    body: json.encode(data),
+  );
+
+  print('STATUS CODE: ${response.statusCode}');
+  print('BODY: ${response.body}');
+  
+  return response.statusCode == 201;
+}
+
 
   static Future<bool> deleteItinerary(int id) async {
     final response = await http.delete(Uri.parse('$baseUrl/itineraries/$id'));

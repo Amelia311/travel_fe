@@ -4,7 +4,7 @@ import '../services/itinerary_service.dart';
 class AddActivityScreen extends StatefulWidget {
   final int tripId;
 
-  const AddActivityScreen({required this.tripId});
+  const AddActivityScreen({super.key, required this.tripId});
 
   @override
   _AddActivityScreenState createState() => _AddActivityScreenState();
@@ -19,7 +19,7 @@ class _AddActivityScreenState extends State<AddActivityScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Tambah Aktivitas")),
+      appBar: AppBar(title: const Text("Tambah Aktivitas")),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -70,7 +70,9 @@ class _AddActivityScreenState extends State<AddActivityScreen> {
                   if (_formKey.currentState!.validate() &&
                       _selectedDay != null &&
                       _selectedTime != null) {
-                    final timeFormatted = "${_selectedTime!.hour.toString().padLeft(2, '0')}:${_selectedTime!.minute.toString().padLeft(2, '0')}";
+                    final timeFormatted =
+                        "${_selectedTime!.hour.toString().padLeft(2, '0')}:${_selectedTime!.minute.toString().padLeft(2, '0')}";
+
                     final success = await ItineraryService.addItinerary({
                       "trip_id": widget.tripId,
                       "activity": _activityController.text,
@@ -78,10 +80,15 @@ class _AddActivityScreenState extends State<AddActivityScreen> {
                       "time": timeFormatted,
                     });
 
-                    if (success) Navigator.pop(context, true);
-                    else ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Gagal menambahkan aktivitas")),
-                    );
+                    if (success) {
+                      Navigator.pop(context, true); // true = tanda berhasil
+                    }
+                    else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text("Gagal menambahkan aktivitas")),
+                      );
+                    }
                   }
                 },
                 child: const Text("Simpan"),
